@@ -117,9 +117,12 @@ class TimerHeading extends HTMLElement {
 				this.minutes = this.shadowRoot.querySelector('#min');
 				this.seconds = this.shadowRoot.querySelector('#sec');
 				this.timer;
-		}
+		}		
 		
 		conditions() {
+//this will change the values to default value for everything
+					if (this.hours.value == 0 && this.minutes.value == 0 && this.seconds.value == 0) this.defaultCondition()
+		
 		if (this.hours.value != 0 && this.minutes.value == 0 && this.seconds.value == 0) {
 				this.hours.value--;
 				this.minutes.value = 59;
@@ -142,13 +145,22 @@ class TimerHeading extends HTMLElement {
 				}, 1000);	
 		}
 		
+		defaultCondition() {	   
+				this.hours.value = '';
+				this.minutes.value = '';
+				this.seconds.value = '';
+				clearInterval(this.timer);
+				let startBtn = this.shadowRoot.querySelector('#startBtn');
+				startBtn.disabled = false;
+		}
+		
 		connectedCallback() {
 				let startBtn = this.shadowRoot.querySelector('#startBtn');
 				startBtn.addEventListener('click', () => {
 				if (this.hours.value != 0 || this.minutes.value != 0 || this.seconds.value != 0) {
 				  this.startTimer();
 			   	startBtn.disabled = true;
-				}			
+			  }
 		});
 				
 				let stopBtn = this.shadowRoot.querySelector('#stopBtn');
@@ -158,7 +170,7 @@ class TimerHeading extends HTMLElement {
 				});
 				
 				let resetBtn = this.shadowRoot.querySelector('#resetBtn');
-		resetBtn.addEventListener('click', () => {
+				resetBtn.addEventListener('click', () => {
 				clearInterval(this.timer);
 				this.hours.value = '';
 				this.minutes.value = '';
@@ -167,7 +179,7 @@ class TimerHeading extends HTMLElement {
 				if (!startBtn.disabled) return;		
 		 	 else	startBtn.disabled = false;
 		});
-		}
+}
 		
 		discountedCallback () {
 		//start Button
