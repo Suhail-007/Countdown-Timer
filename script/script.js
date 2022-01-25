@@ -121,7 +121,7 @@ class TimerHeading extends HTMLElement {
 		
 		conditions() {
 //this will change the values to default value for everything
-					if (this.hours.value == 0 && this.minutes.value == 0 && this.seconds.value == 0) this.defaultCondition()
+		if (this.hours.value == 0 && this.minutes.value == 0 && this.seconds.value == 0) this.defaultCondition()
 		
 		if (this.hours.value != 0 && this.minutes.value == 0 && this.seconds.value == 0) {
 				this.hours.value--;
