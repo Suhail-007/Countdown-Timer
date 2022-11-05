@@ -108,89 +108,116 @@ template.innerHTML = `
 
 
 class TimerHeading extends HTMLElement {
-		constructor() {
-				super();
-				this.attachShadow({ mode: 'open' });
-				this.shadowRoot.appendChild(template.content.cloneNode(true));
-				this.shadowRoot.querySelector('.heading').innerHTML = this.getAttribute('heading');
-				this.hours = this.shadowRoot.querySelector('#hrs');
-				this.minutes = this.shadowRoot.querySelector('#min');
-				this.seconds = this.shadowRoot.querySelector('#sec');
-				this.timer;
-		}		
-		
-		conditions() {
-//this will change the values to default value for everything
-		if (this.hours.value == 0 && this.minutes.value == 0 && this.seconds.value == 0) this.defaultCondition()
-		
-		if (this.hours.value != 0 && this.minutes.value == 0 && this.seconds.value == 0) {
-				this.hours.value--;
-				this.minutes.value = 59;
-				this.seconds.value = 60;
-		}
-		
-		if (this.minutes.value != 0 && this.seconds.value == 0) {
-				this.minutes.value--;
-				this.seconds.value = 60;
-		}
-		
-		if (this.seconds.value != 0) {
-				this.seconds.value--;
-		}
-}
-		
-		startTimer() {
-				this.timer = setInterval(() => {
-						this.conditions();
-				}, 1000);	
-		}
-		
-		defaultCondition() {	   
-				this.hours.value = '';
-				this.minutes.value = '';
-				this.seconds.value = '';
-				clearInterval(this.timer);
-				let startBtn = this.shadowRoot.querySelector('#startBtn');
-				startBtn.disabled = false;
-		}
-		
-		connectedCallback() {
-				let startBtn = this.shadowRoot.querySelector('#startBtn');
-				startBtn.addEventListener('click', () => {
-				if (this.hours.value != 0 || this.minutes.value != 0 || this.seconds.value != 0) {
-				  this.startTimer();
-			   	startBtn.disabled = true;
-			  }
-		});
-				
-				let stopBtn = this.shadowRoot.querySelector('#stopBtn');
-				stopBtn.addEventListener('click', () => {
-						startBtn.disabled = false;
-						clearInterval(this.timer);
-				});
-				
-				let resetBtn = this.shadowRoot.querySelector('#resetBtn');
-				resetBtn.addEventListener('click', () => {
-				clearInterval(this.timer);
-				this.hours.value = '';
-				this.minutes.value = '';
-				this.seconds.value = '';
-				
-				if (!startBtn.disabled) return;		
-		 	 else	startBtn.disabled = false;
-		});
-}
-		
-		discountedCallback () {
-		//start Button
-this.shadowRoot.querySelector('#startBtn').removeEventListener();
+  #startBtn;
+  #stopBtn;
+  #resetBtn
+  #hours;
+  #minutes;
+  #secs;
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-//stop Button
-this.shadowRoot.querySelector('#stopBtn').removeEventListener();
+    this.shadowRoot.querySelector('.heading').innerHTML = this.getAttribute('heading');
 
-//resetButton
-this.shadowRoot.querySelector('#resetBtn').removeEventListener();
-		}
+    this.#initVariables();
+    this.timer;
+  }
+
+  #initVariables() {
+    this.#startBtn = this.shadowRoot.querySelector('#startBtn');
+    this.#stopBtn = this.shadowRoot.querySelector('#stopBtn');
+    this.#resetBtn = this.shadowRoot.querySelector('#resetBtn');
+    this.#hours = this.shadowRoot.querySelector('#hrs');
+    this.#minutes = this.shadowRoot.querySelector('#min');
+    this.#secs = this.shadowRoot.querySelector('#sec');
+  }
+
+  #conditions() {
+    //this will change the values to default value for everything
+    if (this.#hours.value == 0 && this.#minutes.value == 0 && this.#secs.value == 0) {
+      this.#defaultCondition();
+      this.#enableInputs();
+    }
+
+    if (this.#hours.value != 0 && this.#minutes.value == 0 && this.#secs.value == 0) {
+      this.#hours.value--;
+      this.#minutes.value = 59;
+      this.#secs.value = 60;
+    }
+
+    if (this.#minutes.value != 0 && this.#secs.value == 0) {
+      this.#minutes.value--;
+      this.#secs.value = 60;
+    }
+
+    if (this.#secs.value != 0) {
+      this.#secs.value--;
+    }
+  }
+
+  #startTimer() {
+    this.timer = setInterval(() => {
+      this.#conditions();
+    }, 1000);
+  }
+
+  #defaultCondition() {
+    this.#hours.value = '';
+    this.#minutes.value = '';
+    this.#secs.value = '';
+    clearInterval(this.timer);
+
+    if (!this.#startBtn.disabled) return;
+    else this.#startBtn.disabled = false;
+  }
+
+  connectedCallback() {
+    this.#startBtn.addEventListener('click', () => {
+      if (this.#hours.value != 0 || this.#minutes.value != 0 || this.#secs.value != 0) {
+        this.#startTimer();
+        this.#startBtn.disabled = true;
+        //disable inputs as soon as countdown starts
+        this.#disableInputs();
+      }
+    });
+
+    this.#stopBtn.addEventListener('click', () => {
+      this.#startBtn.disabled = false;
+      clearInterval(this.timer);
+      this.#enableInputs();
+    });
+
+    this.#resetBtn.addEventListener('click', () => {
+      clearInterval(this.timer);
+      this.#defaultCondition();
+      this.#enableInputs();
+    });
+  }
+
+  #discountedCallback() {
+    //start Button
+    this.#startBtn.removeEventListener();
+
+    //stop Button
+    this.#stopBtn.removeEventListener();
+
+    //resetButton
+    this.#resetBtn.removeEventListener();
+  }
+
+  #disableInputs() {
+    this.#hours.disabled = true;
+    this.#minutes.disabled = true;
+    this.#secs.disabled = true;
+  }
+
+  #enableInputs() {
+    this.#hours.disabled = false;
+    this.#minutes.disabled = false;
+    this.#secs.disabled = false;
+  }
 }
 
 window.customElements.define('timer-heading', TimerHeading);
